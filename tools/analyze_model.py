@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) Facebook, Inc. and its affiliates.
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+
 import logging
 import numpy as np
 from collections import Counter

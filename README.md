@@ -1,4 +1,4 @@
-<h2 align="left">detrex</h2>
+<!-- <h2 align="left">detrex</h2>
 <p align="left">
     <a href="https://github.com/IDEA-Research/detrex/releases">
         <img alt="release" src="https://img.shields.io/github/v/release/IDEA-Research/detrex">
@@ -25,89 +25,70 @@
 [👀Model Zoo](https://detrex.readthedocs.io/en/latest/tutorials/Model_Zoo.html) |
 [🚀Awesome DETR](https://github.com/IDEA-Research/awesome-detection-transformer) |
 [🆕News](#whats-new) |
-[🤔Reporting Issues](https://github.com/IDEA-Research/detrex/issues/new/choose)
+[🤔Reporting Issues](https://github.com/IDEA-Research/detrex/issues/new/choose) -->
+
+# Expediting Large-Scale Vision Transformer for Dense Prediction without Fine-tuning
 
 
 ## Introduction
 
-detrex is an open-source toolbox that provides state-of-the-art Transformer-based detection algorithms. It is built on top of [Detectron2](https://github.com/facebookresearch/detectron2) and its module design is partially borrowed from [MMDetection](https://github.com/open-mmlab/mmdetection) and [DETR](https://github.com/facebookresearch/detr). Many thanks for their nicely organized code. The main branch works with **Pytorch 1.10+** or higher (we recommend **Pytorch 1.12**).
+This is the official implementation of the paper "[Expediting Large-Scale Vision Transformer for Dense Prediction without Fine-tuning](https://arxiv.org/abs/2210.01035)" on [DINO](https://arxiv.org/abs/2104.14294) and [MaskDINO](https://arxiv.org/abs/2206.02777). You can try our method on other frameworks.
 
-<div align="center">
-  <img src="./assets/detr_arch.png" width="100%"/>
-</div>
+![framework](assets/Hourglass_swin_framework.png)
+![framework](assets/TokenClusterReconstruct_Details.png)
 
-<details open>
-<summary> Major Features </summary>
+## Results 
 
-- **Modular Design.** detrex decomposes the Transformer-based detection framework into various components which help users easily build their own customized models.
+Here we implement our method on Swin backbone. Thus we report the GFLOPs and FPS of backbone. 
 
-- **State-of-the-art Methods.** detrex provides a series of Transformer-based detection algorithms, including [DINO](https://arxiv.org/abs/2203.03605) which reached the SOTA of DETR-like models with **63.3AP**!
+### Object Dectection
 
-- **Easy to Use.** detrex is designed to be **light-weight** and easy for users to use:
-  - [LazyConfig System](https://detectron2.readthedocs.io/en/latest/tutorials/lazyconfigs.html) for more flexible syntax and cleaner config files.
-  - Light-weight [training engine](./tools/train_net.py) modified from detectron2 [lazyconfig_train_net.py](https://github.com/facebookresearch/detectron2/blob/main/tools/lazyconfig_train_net.py)
+| Method           | Backbone | $\alpha$ | h $\times$ w   | GFLOPs | FPS   | mAP  |
+| ---------------- | -------- | -------- | -------------- | ------ | ----- | ----- |
+| DINO        | Swin-L | -        | 12 $\times$ 12 | 937 | 4.42  |  58.5 |
+| DINO + Ours | Swin-L | 16       |  9 $\times$ 9  | 838 | 4.90  |  58.0 |
+| DINO + Ours | Swin-L | 14       |  8 $\times$ 8  | 768 | 5.32  |  57.7 |
+| DINO + Ours | Swin-L | 10       |  8 $\times$ 8  | 683 | 5.82  |  57.0 |
 
-Apart from detrex, we also released a repo [Awesome Detection Transformer](https://github.com/IDEA-Research/awesome-detection-transformer) to present papers about Transformer for detection and segmentation.
+### Instance Segmentation
 
-</details>
+| Method           | Backbone | $\alpha$ | h $\times$ w   | GFLOPs | FPS   | Mask AP  |
+| ---------------- | -------- | -------- | -------------- | ------ | ----- | ----- |
+| MaskDINO        | Swin-L | -        | 12 $\times$ 12 | 937 | 4.42  |  52.3 |
+| MaskDINO + Ours | Swin-L | 16       |  9 $\times$ 9  | 838 | 4.90  |  52.1 |
+| MaskDINO + Ours | Swin-L | 10       |  9 $\times$ 9  | 737 | 5.32  |  51.6 |
+| MaskDINO + Ours | Swin-L | 8        |  8 $\times$ 8  | 640 | 5.82  |  50.9 |
 
-## Fun Facts
-The repo name detrex has several interpretations:
-- <font color=blue> <b> detr-ex </b> </font>: We take our hats off to DETR and regard this repo as an extension of Transformer-based detection algorithms.
+### Panoptic Segmentation
 
-- <font color=#db7093> <b> det-rex </b> </font>: rex literally means 'king' in Latin. We hope this repo can help advance the state of the art on object detection by providing the best Transformer-based detection algorithms from the research community.
-
-- <font color=#008000> <b> de-t.rex </b> </font>: de means 'the' in Dutch. T.rex, also called Tyrannosaurus Rex, means 'king of the tyrant lizards' and connects to our research work 'DINO', which is short for Dinosaur.
-
-## What's New
-v0.2.0 was released on 13/11/2022:
-- Release new baselines for `DINO-R50-12ep`, `DINO-Swin-Large-36ep`, `DAB-Deformable-DETR-R50-50ep`, `DAB-Deformable-DETR-R50-Two-Stage`, please check [Model Zoo](https://detrex.readthedocs.io/en/latest/tutorials/Model_Zoo.html).
-- Rebuild more clear config files for projects.
-- Support [H-Deformable-DETR](./projects/h_deformable_detr/)
-- Release H-Deformable-DETR pretrained weights including `H-Deformable-DETR-R50`, `H-Deformable-DETR-Swin-Tiny`, `H-Deformable-DETR-Swin-Large` in [H-Deformable-DETR](./projects/h_deformable_detr/)
-- Add demo for visualizing customized input images or videos using pretrained weights in [demo](./demo/)
-
-Please see [changelog.md](./changlog.md) for details and release history.
+| Method           | Backbone | $\alpha$ | h $\times$ w   | GFLOPs | FPS   | PQ  |
+| ---------------- | -------- | -------- | -------------- | ------ | ----- | ----- |
+| MaskDINO        | Swin-L | -        | 12 $\times$ 12 | 937 | 4.42  |  58.3 |
+| MaskDINO + Ours | Swin-L | 16       |  9 $\times$ 9  | 838 | 4.75  |  58.1 |
+| MaskDINO + Ours | Swin-L | 12       |  9 $\times$ 9  | 771 | 5.20  |  57.9 |
+| MaskDINO + Ours | Swin-L | 10       |  8 $\times$ 8  | 683 | 5.80  |  57.4 |
 
 ## Installation
 
-Please refer to [Installation Instructions](https://detrex.readthedocs.io/en/latest/tutorials/Installation.html) for the details of installation.
+Please refer to [Installation Instructions](https://detrex.readthedocs.io/en/latest/tutorials/Installation.html) for the details of installation. Note that you need to install this repo instead of original detrex.
 
 ## Getting Started
 
-Please refer to [Getting Started with detrex](https://detrex.readthedocs.io/en/latest/tutorials/Getting_Started.html) for the basic usage of detrex. We also provides other tutorials for:
-- [Learn about the config system of detrex](https://detrex.readthedocs.io/en/latest/tutorials/Config_System.html)
-- [How to convert the pretrained weights from original detr repo into detrex format](https://detrex.readthedocs.io/en/latest/tutorials/Converters.html)
-- [Visualize your training data and testing results on COCO dataset](https://detrex.readthedocs.io/en/latest/tutorials/Tools.html#visualization)
-- [Analyze the model under detrex](https://detrex.readthedocs.io/en/latest/tutorials/Tools.html#model-analysis)
-- [Download and initialize with the pretrained backbone weights](https://detrex.readthedocs.io/en/latest/tutorials/Using_Pretrained_Backbone.html)
-- [Frequently asked questions](https://github.com/IDEA-Research/detrex/issues/109)
+If you want to evaluate DINO with our method, you need to download the specified checkpoint released in [DINO](projects/dino/), and consider running following command:
 
-## Documentation
+```bash
+python tools/train_net.py --config-file projects/dino/configs/dino_hourglass_swin_large_384_5scale_36ep.py --num-gpus 4 --eval-only train.init_checkpoint=/path/to/checkpoint
+```
 
-Please see [documentation](https://detrex.readthedocs.io/en/latest/index.html) for full API documentation and tutorials.
+If you want to evaluate MaskDINO with our method, you need to download the specified checkpoint released in [MaskDINO](projects/maskdino/), and consider running following command:
 
-## Model Zoo
-Results and models are available in [model zoo](https://detrex.readthedocs.io/en/latest/tutorials/Model_Zoo.html).
+```bash
+python tools/train_net.py --config-file projects/maskdino/configs/maskdino_hourglass_swin_large_384_coco_instance_seg_50ep.py --num-gpus 4 --eval-only train.init_checkpoint=/path/to/checkpoint
+```
 
-<details open>
-<summary> Supported methods </summary>
-
-- [x] [DETR (ECCV'2020)](./projects/detr/)
-- [x] [Deformable-DETR (ICLR'2021 Oral)](./projects/deformable_detr/)
-- [x] [Conditional-DETR (ICCV'2021)](./projects/conditional_detr/)
-- [x] [DAB-DETR (ICLR'2022)](./projects/dab_detr/)
-- [x] [DAB-Deformable-DETR (ICLR'2022)](./projects/dab_deformable_detr/)
-- [x] [DN-DETR (CVPR'2022 Oral)](./projects/dn_detr/)
-- [x] [DN-Deformable-DETR (CVPR'2022 Oral)](./projects/dn_deformable_detr/)
-- [x] [DINO (ArXiv'2022)](./projects/dino/)
-- [x] [Group-DETR (ArXiv' 2022)](./projects/group_detr/)
-- [x] [H-Deformable-DETR (ArXiv' 2022)](./projects/h_deformable_detr/)
-
-Please see [projects](./projects/) for the details about projects that are built based on detrex.
-
-</details>
-
+```bash
+python tools/train_net.py --config-file projects/maskdino/configs/maskdino_hourglass_swin_large_384_coco_panoptic_seg_50ep.py --num-gpus 4 --eval-only train.init_checkpoint=/path/to/checkpoint
+```
 
 ## License
 
@@ -115,82 +96,21 @@ This project is released under the [Apache 2.0 license](LICENSE).
 
 
 ## Acknowledgement
-- detrex is an open-source toolbox for Transformer-based detection algorithms created by researchers of **IDEACVR**. We appreciate all contributions to detrex!
-- detrex is built based on [Detectron2](https://github.com/facebookresearch/detectron2) and part of its module design is borrowed from [MMDetection](https://github.com/open-mmlab/mmdetection), [DETR](https://github.com/facebookresearch/detr), and [Deformable-DETR](https://github.com/fundamentalvision/Deformable-DETR).
+The repo is built based on [detrex](https://github.com/IDEA-Research/detrex) v0.2.0.
 
 
 ## Citation
-If you find the projects held by detrex useful in your research, please consider cite:
+If you find this project useful in your research, please consider cite:
 
-<details>
-<summary> <b> Citation List </b> </summary>
-
-- Cite **detrex**
-```BibTeX
-@misc{ideacvr2022detrex,
-  author =       {detrex contributors},
-  title =        {detrex: An Research Platform for Transformer-based Object Detection Algorithms},
-  howpublished = {\url{https://github.com/IDEA-Research/detrex}},
-  year =         {2022}
-}
-```
-
-- Cite **DETR**
 ```BibTex
-@inproceedings{carion2020end,
-  title={End-to-end object detection with transformers},
-  author={Carion, Nicolas and Massa, Francisco and Synnaeve, Gabriel and Usunier, Nicolas and Kirillov, Alexander and Zagoruyko, Sergey},
-  booktitle={European conference on computer vision},
-  pages={213--229},
-  year={2020},
-  organization={Springer}
+@article{liang2022expediting,
+	author    = {Liang, Weicong and Yuan, Yuhui and Ding, Henghui and Luo, Xiao and Lin, Weihong and Jia, Ding and Zhang, Zheng and Zhang, Chao and Hu, Han},
+	title     = {Expediting large-scale vision transformer for dense prediction without fine-tuning},
+	journal   = {arXiv preprint arXiv:2210.01035},
+	year      = {2022},
 }
 ```
 
-- Cite **Deformable-DETR**
-```BibTex
-@article{zhu2020deformable,
-  title={Deformable DETR: Deformable Transformers for End-to-End Object Detection},
-  author={Zhu, Xizhou and Su, Weijie and Lu, Lewei and Li, Bin and Wang, Xiaogang and Dai, Jifeng},
-  journal={arXiv preprint arXiv:2010.04159},
-  year={2020}
-}
-```
-
-- Cite **Conditional-DETR**
-```BibTex
-@inproceedings{meng2021-CondDETR,
-  title       = {Conditional DETR for Fast Training Convergence},
-  author      = {Meng, Depu and Chen, Xiaokang and Fan, Zejia and Zeng, Gang and Li, Houqiang and Yuan, Yuhui and Sun, Lei and Wang, Jingdong},
-  booktitle   = {Proceedings of the IEEE International Conference on Computer Vision (ICCV)},
-  year        = {2021}
-}
-```
-
-- Cite **DAB-DETR**
-```BibTex
-@inproceedings{
-      liu2022dabdetr,
-      title={{DAB}-{DETR}: Dynamic Anchor Boxes are Better Queries for {DETR}},
-      author={Shilong Liu and Feng Li and Hao Zhang and Xiao Yang and Xianbiao Qi and Hang Su and Jun Zhu and Lei Zhang},
-      booktitle={International Conference on Learning Representations},
-      year={2022},
-      url={https://openreview.net/forum?id=oMI9PjOb9Jl}
-}
-```
-
-- Cite **DN-DETR**
-```BibTex
-@inproceedings{li2022dn,
-      title={Dn-detr: Accelerate detr training by introducing query denoising},
-      author={Li, Feng and Zhang, Hao and Liu, Shilong and Guo, Jian and Ni, Lionel M and Zhang, Lei},
-      booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
-      pages={13619--13627},
-      year={2022}
-}
-```
-
-- Cite **DINO**
 ```BibTex
 @misc{zhang2022dino,
       title={DINO: DETR with Improved DeNoising Anchor Boxes for End-to-End Object Detection}, 
@@ -202,27 +122,16 @@ If you find the projects held by detrex useful in your research, please consider
 }
 ```
 
-- Cite **Group-DETR**
 ```BibTex
-@article{chen2022group,
-  title={Group DETR: Fast DETR Training with Group-Wise One-to-Many Assignment},
-  author={Chen, Qiang and Chen, Xiaokang and Wang, Jian and Feng, Haocheng and Han, Junyu and Ding, Errui and Zeng, Gang and Wang, Jingdong},
-  journal={arXiv preprint arXiv:2207.13085},
-  year={2022}
+@misc{li2022mask,
+      title={Mask DINO: Towards A Unified Transformer-based Framework for Object Detection and Segmentation}, 
+      author={Feng Li and Hao Zhang and Huaizhe xu and Shilong Liu and Lei Zhang and Lionel M. Ni and Heung-Yeung Shum},
+      year={2022},
+      eprint={2206.02777},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
 }
 ```
-
-- Cite **H-DETR**
-```BibTex
-@article{jia2022detrs,
-  title={DETRs with Hybrid Matching},
-  author={Jia, Ding and Yuan, Yuhui and He, Haodi and Wu, Xiaopei and Yu, Haojun and Lin, Weihong and Sun, Lei and Zhang, Chao and Hu, Han},
-  journal={arXiv preprint arXiv:2207.13080},
-  year={2022}
-}
-```
-
-</details>
 
 
 

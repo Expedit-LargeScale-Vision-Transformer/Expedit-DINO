@@ -5,6 +5,9 @@ A script to benchmark builtin models.
 Note: this script has an extra dependency of psutil.
 """
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+
 import itertools
 import logging
 import psutil
